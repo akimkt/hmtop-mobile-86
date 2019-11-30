@@ -1,5 +1,5 @@
 const TokenKey = 'hm-toutiao-m-86-user'
-// 约定数据value格式{token:'',refresh_token:''}
+// 注意！！！ 约定数据value格式{token:'',refresh_token:''}
 
 // 获取token的方法
 export const getToken = () => {
