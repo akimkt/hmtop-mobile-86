@@ -22,7 +22,6 @@ const instance = axios.create({
 instance.interceptors.request.use(
   // 拦截成功时
   config => {
-    console.log(config)
     // 在请求拦截器中配置，如果本地有token数据
     if (store.state.UserToken.token) {
     // 将token信息添加到请求头的认证信息中

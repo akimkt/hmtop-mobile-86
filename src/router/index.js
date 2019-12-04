@@ -8,7 +8,7 @@ const routes = [
   { path: '/',
     component: () => import('@/views/Index'),
     children: [
-      { path: '/', name: 'home', component: () => import('@/views/home') },
+      { path: '/', name: 'home', component: () => import('@/views/home'), meta: { iskeepAlive: true } },
       { path: '/question', name: 'question', component: () => import('@/views/question') },
       { path: '/video', name: 'video', component: () => import('@/views/video') },
       { path: '/user', name: 'user', component: () => import('@/views/user') }
@@ -19,7 +19,7 @@ const routes = [
   { path: '/login', name: 'login', component: () => import('@/views/login') },
   { path: '/search', name: 'search', component: () => import('@/views/search') },
   { path: '/search/result', name: 'result', component: () => import('@/views/search/result') },
-  { path: '/article', name: 'article', component: () => import('@/views/article') }
+  { path: '/article', name: 'article', component: () => import('@/views/article'), meta: { iskeepAlive: true } }
 ]
 
 const router = new VueRouter({
