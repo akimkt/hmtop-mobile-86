@@ -35,7 +35,7 @@
               <van-cell-group>
                 <!-- // 遍历对应频道列表中的文章列表，展示 -->
                 <van-cell v-for="item in channel.articleList"
-                          :key="item.art_id.toString()">
+                          :key="item.art_id.toString()" :to="'/article/'+item.art_id.toString()">
                   <div class="article_item">
                     <h3 class="van-ellipsis">{{item.title}}</h3>
                     <div class="img_box"
@@ -67,8 +67,7 @@
                       <!-- 点击弹出more-action组件 需要传值，修改 子组件 的显示和隐藏 -->
                       <span v-if="UserToken.token"
                             class="close"
-                            @click="showMoreAction=!showMoreAction"
-                            >
+                            @click.stop="showMore(item.art_id.toString())">
                         <van-icon name="cross"></van-icon>
                       </span>
                     </div>
@@ -81,17 +80,24 @@
       </van-tab>
     </van-tabs>
     <span class="bar_btn"
-          slot="nav-right">
+          slot="nav-right" @click="showCE=!showCE">
       <van-icon name="wap-nav"></van-icon>
     </span>
-      <!-- 如果用户登录了才加载此组件
+    <!-- 如果用户登录了才加载此组件
         在首页自定义value属性传值给子组件，决定子组件显示和隐藏
         给子组件定义方法input
        -->
     <!-- <more-action v-if="UserToken.token" :value="showMoreAction" @input="showMoreAction=$event"></more-action>
       因为，父给子传的值和子给父传的值是同一个值，所以可以简写成如下：
     -->
-    <more-action v-if="UserToken.token" v-model="showMoreAction"></more-action>
+    <more-action v-if="UserToken.token"
+                 v-model="showMoreAction"
+                 :clickId="clickArticleId"
+                 @dislikeThis="delthisArticle"
+                 @reportThis="delthisArticle"
+                 ></more-action>
+    <!-- <channel-edit :channelList="channelList" v-model="showCE" :activeIndex="activeIndex" @update="activeIndex=$event"></channel-edit> -->
+    <channel-edit :channelList="channelList" v-model="showCE" :activeIndex.sync="activeIndex" ></channel-edit>
   </div>
 </template>
 
@@ -99,11 +105,13 @@
 import { getMyChannel } from '@/api/channel'
 import { getUserArticles } from '@/api/article'
 import { mapState } from 'vuex'
-import MoreAction from './more-action'
+import MoreAction from './components/more-action'
+import ChannelEdit from './components/channel-edit'
 export default {
   name: 'home-index',
   components: {
-    MoreAction
+    MoreAction,
+    ChannelEdit
   },
   data () {
     return {
@@ -111,7 +119,9 @@ export default {
       // 刷新完成提示文字
       refreshSuccessText: '',
       channelList: [],
-      showMoreAction: false
+      clickArticleId: '',
+      showMoreAction: false,
+      showCE: false
     }
   },
   computed: {
@@ -139,10 +149,14 @@ export default {
     }
   },
   methods: {
+    showMore (id) {
+      this.showMoreAction = true
+      this.clickArticleId = id
+    },
     // 加载文章列表
     async onLoad () {
       // 显示加载中
-      this.loading = true
+
       if (!this.activeChannel) return false
       try {
         await this.$sleep()
@@ -200,10 +214,10 @@ export default {
         this.activeChannel.id,
         this.activeChannel.timestamp
       )
+      this.activeChannel.downLoading = false
       // 如果有请求到数据
       if (data.results.length) {
         this.activeChannel.articles = data.results
-        this.activeChannel.downLoading = false
         this.refreshSuccessText = '更新成功'
         // 记录时间戳 下一次请求数据想需要
         this.activeChannel.timestamp = data.pre_timestamp
@@ -212,14 +226,15 @@ export default {
         this.onLoad()
       } else {
         // 否则就提示暂无更新
-        this.activeChannel.downLoading = false
         this.refreshSuccessText = '暂无更新'
       }
     },
+
     // 当切换频道时的钩子函数
     channelChange () {
       // 如果当前频道的文章列表中没有数据
-      if (!this.activeChannel.articleList) {
+      if (!this.activeChannel.articleList.length) {
+        // this.activeChannel.downLoading = true
         // 请求当前频道的文章列表数据
         this.activeChannel.upLoading = true
         this.activeChannel.finished = false
@@ -235,6 +250,12 @@ export default {
     // dom滚动的高度
     remember (e) {
       this.activeChannel.scrollTop = e.target.scrollTop
+    },
+    // 删除目标文章
+    delthisArticle () {
+      var articles = this.activeChannel.articleList
+      const index = articles.findIndex(item => item.art_id.toString() === this.clickArticleId)
+      articles.splice(index, 1)
     }
   },
   created () {
@@ -341,5 +362,4 @@ export default {
     }
   }
 }
-
 </style>

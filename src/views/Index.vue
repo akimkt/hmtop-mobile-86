@@ -1,9 +1,12 @@
 <template>
   <div class="container">
     <!-- 当路由地址（path === $route.path）不是`我的`才显示 -->
-    <van-nav-bar fixed title="黑马头条" right-text="搜索"
-      @click-right="$router.push('/search')"/>
-    <div class="my-wrapper" >
+    <van-nav-bar fixed title="黑马头条"
+    right-text="搜索"
+      @click-right="$router.push('/search')"
+      v-if="showNavBar"/>
+      <!-- 如果 当前路由地址是/user显示类名noTop -->
+    <div class="my-wrapper" :class="{noTop:!showNavBar}" >
       <router-view></router-view>
     </div>
     <van-tabbar route>
@@ -21,6 +24,11 @@ export default {
   data () {
     return {
       active: 0
+    }
+  },
+  computed: {
+    showNavBar () {
+      return this.$route.path !== '/user'
     }
   }
 }

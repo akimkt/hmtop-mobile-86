@@ -7,26 +7,22 @@
     这里通过打开弹出层修改isReport的值，popup去显示或者隐藏内部的指定盒子 -->
 <van-popup :value="value" @open="isReport=false" @input="$emit('input',$event)">
     <van-cell-group v-if="!isReport">
-      <van-cell>不感兴趣</van-cell>
+      <van-cell @click="delArticle">不感兴趣</van-cell>
       <van-cell is-link @click="isReport=true">反馈垃圾内容</van-cell>
       <van-cell>拉黑作者</van-cell>
     </van-cell-group>
     <van-cell-group v-else>
       <van-cell icon="arrow-left" @click="isReport=false">返回</van-cell>
-      <van-cell>侵权</van-cell>
-      <van-cell>色情</van-cell>
-      <van-cell>暴力</van-cell>
-      <van-cell>低俗</van-cell>
-      <van-cell>不适</van-cell>
-      <van-cell>错误</van-cell>
-      <van-cell>其他</van-cell>
+      <van-cell v-for="item in reports" :key="item.value" @click="reportArticle(item.value)">{{item.label}}</van-cell>
     </van-cell-group>
   </van-popup>
 </div>
 </template>
 
 <script>
-
+// import request from '@/utils/request'
+import { disLikeArticle, report } from '@/api/article'
+import { reports } from '@/api/constants'
 export default {
   name: 'more-action',
   props: {
@@ -34,12 +30,39 @@ export default {
     value: {
       type: Boolean,
       default: false
+    },
+    clickId: {
+      type: String,
+      default: ''
     }
   },
   data () {
     return {
       show: true,
-      isReport: false
+      isReport: false,
+      reports
+    }
+  },
+  methods: {
+    async delArticle () {
+      try {
+        await disLikeArticle(this.clickId)
+        this.$emit('input', false)
+        this.$emit('dislikeThis')
+        this.$toast.success('删除成功')
+      } catch (e) {
+        this.$toast.fail('删除失败')
+      }
+    },
+    async reportArticle (type) {
+      try {
+        await report(this.clickId, type)
+        this.$toast({ type: 'success', message: '举报成功' })
+        this.$emit('input', false)
+        this.$emit('reportThis')
+      } catch (e) {
+        this.$toast.fail('举报失败')
+      }
     }
   }
 }

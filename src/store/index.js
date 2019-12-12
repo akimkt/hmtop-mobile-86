@@ -6,7 +6,11 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     // 存储获取的token数据
-    UserToken: auth.getToken()
+    UserToken: auth.getToken(),
+    userInfo: {
+      name: '',
+      photo: ''
+    }
   },
   mutations: {
     // 定义 设置token的方法,向服务器请求token的情况下，接收到的数据传进来
@@ -21,6 +25,9 @@ export default new Vuex.Store({
       // 清除state中的token数据，同时清除本地的缓存
       state.UserToken = {}
       auth.delToken()
+    },
+    setUseInfo (state, userInfo) {
+      state.userInfo = userInfo
     }
   },
   actions: {

@@ -19,7 +19,7 @@ const routes = [
   { path: '/login', name: 'login', component: () => import('@/views/login') },
   { path: '/search', name: 'search', component: () => import('@/views/search') },
   { path: '/search/result', name: 'result', component: () => import('@/views/search/result') },
-  { path: '/article', name: 'article', component: () => import('@/views/article'), meta: { iskeepAlive: true } }
+  { path: '/article/:id', name: 'article', component: () => import('@/views/article'), meta: { iskeepAlive: true } }
 ]
 
 const router = new VueRouter({
