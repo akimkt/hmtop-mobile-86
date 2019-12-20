@@ -20,7 +20,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import io from 'socket.io-client'
 import xzPhoto from '@/assets/xz.png'
